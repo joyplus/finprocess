@@ -4,8 +4,16 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+func init() {
+	orm.RegisterDriver("sqlite", orm.DR_MySQL)
+	orm.RegisterDataBase("default", "mysql", "root:123456@tcp(localhost:3307)/p2p?charset=utf8")
+	orm.RegisterModel(new(Invest_Contract))
+	orm.RunSyncdb("default", false, true)
+}
+
 type Invest_Contract struct {
-	Id              int            `orm:pk;auto`
+	Id              int           `orm:pk;auto`
+	Name            string        `orm:size(50)`
 	Master_id       int
 	Description     string        `orm:size(100)`
 	Amount_min      int
@@ -22,7 +30,7 @@ type Invest_Contract struct {
 type Invest_ContractDAO struct {
 }
 
-func (this *Invest_ContractDAO) Save(i *Invest_Contract) (int, error) {
+func (this *Invest_ContractDAO) Save(i *Invest_Contract) (int64, error) {
 	o := orm.NewOrm()
 	id, err := o.Insert(i)
 	return id, err

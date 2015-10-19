@@ -4,8 +4,15 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+func init() {
+	orm.RegisterDriver("sqlite", orm.DR_MySQL)
+	orm.RegisterDataBase("default", "mysql", "root:123456@tcp(localhost:3307)/p2p?charset=utf8")
+	orm.RegisterModel(new(Master))
+	orm.RunSyncdb("default", false, true)
+}
+
 type Master struct {
-	Id                   int       	   `orm:pk;auto`
+	Id                   int           `orm:pk;auto`
 	Name                 string        `orm:size(50)`
 	Official_url         string        `orm:size(500)`
 	Product_description  string        `orm:size(100)`
@@ -20,7 +27,7 @@ type Master struct {
 type MasterDAO struct {
 }
 
-func (this *MasterDAO) Save(c *Master) (int, error) {
+func (this *MasterDAO) Save(c *Master) (int64, error) {
 	o := orm.NewOrm()
 	id, err := o.Insert(c)
 	return id, err

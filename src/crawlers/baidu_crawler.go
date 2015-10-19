@@ -6,6 +6,9 @@ import (
 	"github.com/hu17889/go_spider/core/pipeline"
 	"github.com/hu17889/go_spider/core/spider"
 	"fmt"
+	"models"
+	"strings"
+	"strconv"
 )
 
 type BaiduProcesser struct {
@@ -21,23 +24,35 @@ func (this *BaiduProcesser) Process(p *page.Page) {
 
 	products := document.Find("li.list-item").Nodes
 
+	var invest_contracts[40] models.Invest_Contract
+
+	i := 0
+
 	for _, v := range products {
+
+		ic := &models.Invest_Contract{}
 
 		p := goquery.NewDocumentFromNode(v)
 
 		//		For_register  name中包含是否新人专享
 		name := p.Find("div.item-title").Text()
 		fmt.Println(name);
+		ic.Name=name
 
 		//url
 		url, ok := p.Find("a").First().Attr("href")
 		if ok {
 			fmt.Println(url)
+			//url
 		}
 
 		//Amount_min
 		amount_min := p.Find("span.field-col.field-col3").First().Text()
 		fmt.Println(amount_min)
+		a_min, ae := strconv.Atoi(strings.Split(strings.TrimLeft(amount_min, "投资金额："), "元")[0])
+		if ae==nil {
+			ic.Amount_min=a_min
+		}
 
 		//		Duration_min
 		//		Duration_type
@@ -48,8 +63,18 @@ func (this *BaiduProcesser) Process(p *page.Page) {
 		//		rate
 		rate := p.Find("div.item-content-right").Find("span.returns").First().Text()
 		fmt.Println(rate)
+		r, re := strconv.Atoi(rate)
+		if re==nil {
+			ic.Rate=float32(r/100)
+		}
+
+		i++
+		invest_contracts[i]=*ic
+
 
 	}
+
+	//save to db
 
 }
 
