@@ -1,6 +1,7 @@
 package crawlers
 
 import (
+	_ "github.com/go-sql-driver/mysql"
 	"fmt"
 	"finprocess/models"
 	"github.com/astaxie/beego/orm"
@@ -15,8 +16,7 @@ import (
 func init() {
 	orm.RegisterDriver("mysql", orm.DR_MySQL)
 	orm.RegisterDataBase("default", "mysql", "root:123456@tcp(localhost:3307)/p2p?charset=utf8")
-	orm.RegisterModel(new(models.Invest_Contract))
-	orm.RegisterModel(new(models.Master))
+	orm.RegisterModel(new(models.Invest_Contract), new(models.Master))
 
 }
 
@@ -74,15 +74,8 @@ func Crawler() {
 								master.Product_description=idea
 							}
 
-							o := orm.NewOrm()
-							qs := o.QueryTable("master")
-							count, err := qs.Filter("name", master.Name).Count()
-							if err==nil {
-								o.Using("master")
-								if count==0 {
-									o.Insert(master)
-								}
-							}
+							//save master
+							(&models.MasterDao{}).SaveOrUpdate(master)
 
 							invest_contract := &models.Invest_Contract{}
 							invest_contract.For_register=1
@@ -104,19 +97,12 @@ func Crawler() {
 								}
 							}
 
-							//							fmt.Println(invest_contract)
-							//							fmt.Println(master)
+							//fmt.Println(invest_contract)
+							//fmt.Println(master)
 
-							//save to db
-							o1 := orm.NewOrm()
-							qs1 := o1.QueryTable("invest__contract")
-							count1, err1 := qs1.Filter("name", invest_contract.Name).Count()
-							if err1==nil {
-								o1.Using("invest__contract")
-								if count1==0 {
-									o1.Insert(invest_contract)
-								}
-							}
+							//save invest_contract
+							(&models.Invest_ContractDao{}).SaveOrUpdate(invest_contract)
+
 						}
 					}
 				}
