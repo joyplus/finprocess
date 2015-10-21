@@ -2,10 +2,11 @@ package main
 
 import (
 	"time"
+	"finprocess/crawlers"
 )
 
 func main() {
-	DailyReportInit(1)
+	DailyReportInit(60)
 }
 
 

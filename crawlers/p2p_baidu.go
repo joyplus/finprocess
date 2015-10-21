@@ -2,7 +2,7 @@ package crawlers
 
 import (
 	"fmt"
-	"models"
+	"finprocess/models"
 	"github.com/astaxie/beego/orm"
 	"net/http"
 	"io/ioutil"
