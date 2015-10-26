@@ -44,7 +44,6 @@ func Crawler() {
 		}
 
 
-
 		var dat map[string]interface{}
 		if err := json.Unmarshal(body, &dat); err==nil {
 
@@ -101,6 +100,9 @@ func Crawler() {
 							//fmt.Println(master)
 
 							//save invest_contract
+							masterName := strings.Split(invest_contract.Name, " - ")[0]
+							masterId := (&models.MasterDao{}).Query(masterName)
+							invest_contract.Master_id=masterId
 							(&models.Invest_ContractDao{}).SaveOrUpdate(invest_contract)
 
 						}

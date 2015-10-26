@@ -6,7 +6,7 @@ import (
 
 
 type Master struct {
-	Id                   int
+	Id                   int64
 	Name                 string
 	Official_url         string
 	Product_description  string
@@ -15,7 +15,7 @@ type Master struct {
 	Platform_est_rate    float32
 	Platform_min_amount  float32
 	Platform_icon_url    string
-	Risk_rank            int
+	Risk_rank            int64
 }
 
 
@@ -38,6 +38,24 @@ func (this *MasterDao) QueryByName(name string) (int64) {
 		return -1
 	}
 }
+
+
+func (this *MasterDao) Query(name string) int64 {
+	o := orm.NewOrm()
+	m := new(Master)
+	qs := o.QueryTable("fin_p2p_master")
+	err := qs.Filter("name", name).One(m)
+	if err==nil {
+		if m!=nil {
+			return m.Id
+		}else {
+			return -1
+		}
+	}else {
+		return -1
+	}
+}
+
 
 func (this *MasterDao) Save(m *Master) (int64, error) {
 	o := orm.NewOrm()

@@ -6,12 +6,12 @@ import (
 )
 
 func main() {
-	DailyReportInit(60)
+	DailyReportInit(1)
 }
 
 
 func DailyReportInit(minutes int) {
-	timer := time.NewTicker(time.Minute * time.Duration(minutes))
+	timer := time.NewTicker(time.Second * time.Duration(minutes))
 
 	for {
 		select {

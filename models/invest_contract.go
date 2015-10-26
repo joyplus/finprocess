@@ -6,19 +6,19 @@ import (
 
 
 type Invest_Contract struct {
-	Id              int
+	Id              int64
 	Name            string
-	Master_id       int
+	Master_id       int64
 	Description     string
 	Amount_min      string
 	Amount_max      string
 	Duration_min    string
 	Duration_max    string
-	Duration_type   int
-	For_register    int
+	Duration_type   int64
+	For_register    int64
 	Rate            float32
-	Early_terminate int
-	Risk_rank       int
+	Early_terminate int64
+	Risk_rank       int64
 }
 
 
