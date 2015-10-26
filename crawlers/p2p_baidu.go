@@ -12,14 +12,12 @@ import (
 	"encoding/json"
 )
 
-
 func init() {
 	orm.RegisterDriver("mysql", orm.DR_MySQL)
 	orm.RegisterDataBase("default", "mysql", "root:123456@tcp(localhost:3307)/p2p?charset=utf8")
 	orm.RegisterModel(new(models.Invest_Contract), new(models.Master))
 
 }
-
 
 func Crawler() {
 
