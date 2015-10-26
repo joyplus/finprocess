@@ -1,42 +1,78 @@
 package models
-
 import (
 	"github.com/astaxie/beego/orm"
+	"fmt"
 )
 
-func init() {
-	orm.RegisterDriver("sqlite", orm.DR_MySQL)
-	orm.RegisterDataBase("default", "mysql", "root:123456@tcp(localhost:3307)/p2p?charset=utf8")
-	orm.RegisterModel(new(Master))
-	orm.RunSyncdb("default", false, true)
-}
 
 type Master struct {
-	Id                   int           `orm:pk;auto`
-	Name                 string        `orm:size(50)`
-	Official_url         string        `orm:size(500)`
-	Product_description  string        `orm:size(100)`
-	Invest_area          string        `orm:size(50)`
-	Duration_description string        `orm:size(100)`
+	Id                   int64
+	Name                 string
+	Official_url         string
+	Product_description  string
+	Invest_area          string
+	Duration_description string
 	Platform_est_rate    float32
 	Platform_min_amount  float32
-	Platform_icon_url    string        `orm:size(10)`
-	Risk_rank            int
+	Platform_icon_url    string
+	Risk_rank            int64
 }
 
-type MasterDAO struct {
+
+func (this *Master) TableName() string {
+	return "fin_p2p_master"
 }
 
-func (this *MasterDAO) Save(c *Master) (int64, error) {
+type MasterDao struct {
+
+}
+
+func (this *MasterDao) QueryByName(name string) (int64) {
 	o := orm.NewOrm()
-	id, err := o.Insert(c)
+	qs := o.QueryTable("fin_p2p_master")
+	count, err := qs.Filter("name", name).Count()
+	if err == nil {
+		return count
+	}else {
+		fmt.Println(err)
+		return -1
+	}
+}
+
+
+func (this *MasterDao) Query(name string) int64 {
+	o := orm.NewOrm()
+	m := new(Master)
+	qs := o.QueryTable("fin_p2p_master")
+	err := qs.Filter("name", name).One(m)
+	if err==nil {
+		if m!=nil {
+			return m.Id
+		}else {
+			return -1
+		}
+	}else {
+		return -1
+	}
+}
+
+
+func (this *MasterDao) Save(m *Master) (int64, error) {
+	o := orm.NewOrm()
+	id, err := o.Insert(m)
 	return id, err
 }
 
-func (this *MasterDAO) Get(id int) (m *Master) {
+func (this *MasterDao) SaveOrUpdate(m *Master) {
 	o := orm.NewOrm()
-	master := &Master{}
 	qs := o.QueryTable("fin_p2p_master")
-	qs.Filter("id", id).One(master)
-	return master
+	count, err := qs.Filter("name", m.Name).Count()
+	if err ==nil {
+		if count==0 {
+			id, err := o.Insert(m)
+			fmt.Println(id, err)
+		}
+	}else {
+		fmt.Println(err)
+	}
 }
