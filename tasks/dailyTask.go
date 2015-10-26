@@ -1,11 +1,11 @@
-package main
+package tasks
 
 import (
 	"time"
 	"finprocess/crawlers"
 )
 
-func main() {
+func dd() {
 	DailyReportInit(1)
 }
 

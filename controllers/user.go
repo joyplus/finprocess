@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"finprocessa/models"
+	"finprocess/models"
 	"encoding/json"
 
 	"github.com/astaxie/beego"

@@ -8,7 +8,7 @@
 package routers
 
 import (
-	"finprocessa/controllers"
+	"finprocess/controllers"
 
 	"github.com/astaxie/beego"
 )
