@@ -2,6 +2,7 @@ package models
 import (
 	"github.com/astaxie/beego/orm"
 	"fmt"
+	"strconv"
 )
 
 
@@ -19,7 +20,10 @@ type Invest_Contract struct {
 	Rate            float32
 	Early_terminate int
 	Risk_rank       int
+
+	Master          *Master `orm:"-"` //Master  *Master这么写会导致循环依赖
 }
+
 
 
 func (this *Invest_Contract) TableName() string {
@@ -60,4 +64,30 @@ func (this *Invest_ContractDao) SaveOrUpdate(i *Invest_Contract) {
 	}else {
 		fmt.Println(err)
 	}
+}
+
+
+//查询所有产品,目前只显示每个平台rate最高的
+func (this *Invest_ContractDao) ListAll() []Invest_Contract {
+	o := orm.NewOrm()
+	var invests []Invest_Contract
+	//	sql := "select * from ( select * from fin_p2p_invest_contract i group by i.master_id order by i.rate desc) invest left join fin_p2p_master master on master.id=invest.master_id"
+
+	sql := "select * from fin_p2p_invest_contract group by master_id order by rate desc"
+
+	count, err := o.Raw(sql).QueryRows(&invests)
+	if err ==nil && count!=0 {
+		for i, in := range invests {
+			sql_master := "select * from fin_p2p_master where id = "+strconv.Itoa(int(in.Master_id))
+			o1 := orm.NewOrm()
+			m := &Master{}
+			er := o1.Raw(sql_master).QueryRow(m)
+			fmt.Println(i,in.Master_id,m)
+			if er==nil {
+				invests[i].Master=m
+			}
+		}
+		return invests
+	}
+	return nil
 }
