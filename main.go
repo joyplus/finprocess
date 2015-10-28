@@ -1,6 +1,7 @@
 package main
 
 import (
+	m "adexchange/models"
 	_ "finprocess/docs"
 	_ "finprocess/routers"
 
@@ -8,9 +9,6 @@ import (
 )
 
 func main() {
-	if beego.RunMode == "dev" {
-		beego.DirectoryIndex = true
-		beego.StaticDir["/swagger"] = "swagger"
-	}
+	m.Connect()
 	beego.Run()
 }
