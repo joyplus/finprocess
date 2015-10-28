@@ -5,6 +5,7 @@ import (
 )
 
 
+
 type Master struct {
 	Id                   int64
 	Name                 string
@@ -22,6 +23,7 @@ type Master struct {
 func (this *Master) TableName() string {
 	return "fin_p2p_master"
 }
+
 
 type MasterDao struct {
 
