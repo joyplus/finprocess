@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+        <title>scott教你学理财</title>
+        <link href="http://netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="p2p.css">
+    </head>
+    <body>
+        <div class="main">
+            <table class="ui-filter" id="p2p_filter">
+                    <tbody>
+                        <tr>
+                            <td class="ui-select amount-select" v-repeat="item in select_titles" >
+                                <div v-on="click: toggle(item)">
+                                    <span class="ui-select-title {{item.ifdisplay ? 'ui-select-up':''}}">{{item.child_title}}</span><i class="fa fa-angle-{{item.ifdisplay ? 'up':'down'}} fa-fw {{item.ifdisplay ? 'ui-select-up':''}}"></i>
+                                </div>
+                                <div class="ui-filter-con" style="display: {{item.ifdisplay ? 'block':'none'}};">
+                                        <p class="select-item {{$index == item.chosen ? 'selected':''}}" data-value="{{$index}}" v-repeat="item.child_content" v-on="click: select($index,item.index,$value,item)">{{$value}}</p>
+                                        <div class="shadow" v-on="click: cancel"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+            <table>
+            <div class="result wealth-result" id="wealth_result">
+                <a href="{{wealth.url}}" tag="" class="result-item" v-repeat="wealth in wealth_contents" style="display: {{wealth.ifdisplay ? 'block':'none'}};">
+                    <div><span>{{wealth.title}}</span></div>
+                    <ul>
+                        <li class="limit">期限：<b>{{wealth.time}}</b>个月{{wealth.time==1 ? '及以内' : ''}}</li>
+                        <li class="expected">预期收益率：<em>{{wealth.profit}}%</em></li>
+                    </ul>
+                </a>    
+            </div>
+        </div>
+    </body>
+    <script src="./bower_components/vue/dist/vue.min.js"></script>
+    <script src="./bower_components/jquery-2.1.4.js" ></script>
+    <script src="./p2p.js"></script>
+    <script type="text/javascript">
+
+    </script>
+</html>

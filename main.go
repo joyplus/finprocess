@@ -1,7 +1,7 @@
 package main
 
 import (
-	m "finprocess/models"
+	m "adexchange/models"
 	_ "finprocess/docs"
 	_ "finprocess/routers"
 
