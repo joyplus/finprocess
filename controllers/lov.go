@@ -8,7 +8,7 @@ type LovController struct {
 	beego.Controller
 }
 
-// @Title 查询所有类型
+// @Title 查询所有分类
 // @Description 查询所有分类
 // @router /types [get]
 func (this *LovController) Types() {
