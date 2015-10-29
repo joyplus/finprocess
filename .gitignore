@@ -28,3 +28,5 @@ _testmain.go
 finprocess
 
 lastupdate.tmp
+
+logs/finprocess.log

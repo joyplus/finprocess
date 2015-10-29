@@ -1,7 +1,8 @@
 package controllers
+
 import (
 	"github.com/astaxie/beego"
-//	"finprocess/models"
+	//	"finprocess/models"
 	"finprocess/models"
 )
 
@@ -15,6 +16,16 @@ type InvestContractController struct {
 func (this *InvestContractController) ListAll() {
 	investDao := &models.Invest_ContractDao{}
 	invests := investDao.ListAll()
-	this.Data["json"]=invests
+	this.Data["json"] = invests
 	this.ServeJson()
+}
+
+// @Title 显示产品列表页面
+// @Description 显示初试页面
+// @router /view [get]
+func (this *InvestContractController) ViewList() {
+
+	this.TplNames = "p2p/p2p.html"
+	this.Render()
+
 }

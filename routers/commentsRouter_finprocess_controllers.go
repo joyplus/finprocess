@@ -13,6 +13,13 @@ func init() {
 			[]string{"get"},
 			nil})
 
+	beego.GlobalControllerRouter["finprocess/controllers:InvestContractController"] = append(beego.GlobalControllerRouter["finprocess/controllers:InvestContractController"],
+		beego.ControllerComments{
+			"ViewList",
+			`/view`,
+			[]string{"get"},
+			nil})
+
 	beego.GlobalControllerRouter["finprocess/controllers:LovController"] = append(beego.GlobalControllerRouter["finprocess/controllers:LovController"],
 		beego.ControllerComments{
 			"Types",
