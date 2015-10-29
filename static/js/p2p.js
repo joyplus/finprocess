@@ -7,7 +7,7 @@ var $wealth_contents = new Array();
         type: 'GET',
         url: "/v1/lov/types",
         dataType: "json",
-        async: true,
+        async: false,
         contentType: "application/json;charset=UTF-8",
         success: function (data) {
             $data = $(data)
@@ -55,8 +55,9 @@ var $wealth_contents = new Array();
                 var obj = new Object();
 
                 obj.title = $data[i].Name;
-                obj.url="aa";
-                obj.url = $data[i].Master.Official_url;
+                if($data[i].Master){
+                    obj.url = $data[i].Master.Official_url;
+                }
                 obj.profit = $data[i].Rate;
                 obj.money = $data[i].Amount_min;
                 obj.time = $data[i].Duration_min;
