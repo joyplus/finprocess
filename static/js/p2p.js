@@ -5,9 +5,9 @@ var $wealth_contents = new Array();
 (function () {
     $.ajax({
         type: 'GET',
-        url: "http://localhost:7070/v1/lov/types",
+        url: "/v1/lov/types",
         dataType: "json",
-        async: false,
+        async: true,
         contentType: "application/json;charset=UTF-8",
         success: function (data) {
             $data = $(data)
@@ -20,7 +20,7 @@ var $wealth_contents = new Array();
                 child_content[0]="不限"
                 $.ajax({
                     type: "GET",
-                    url: "http://localhost:7070/v1/lov/list/" + $data[i].Code,
+                    url: "/v1/lov/list/" + $data[i].Code,
                     dataType: "json",
                     async: false,
                     success: function (content) {
@@ -45,7 +45,7 @@ var $wealth_contents = new Array();
 
     $.ajax({
         type: 'GET',
-        url: "http://localhost:7070/v1/invest/list",
+        url: "/v1/invest/list",
         dataType: "json",
         async: false,
         contentType: "application/json;charset=UTF-8",
@@ -55,6 +55,7 @@ var $wealth_contents = new Array();
                 var obj = new Object();
 
                 obj.title = $data[i].Name;
+                obj.url="aa";
                 obj.url = $data[i].Master.Official_url;
                 obj.profit = $data[i].Rate;
                 obj.money = $data[i].Amount_min;
