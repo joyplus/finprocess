@@ -39,13 +39,10 @@ func (this *TopicDao) InsertOrUpdate(t *Topic) int64 {
 	o := orm.NewOrm()
 	qs := o.QueryTable("stb_topics")
 	count, err := qs.Filter("title", t.Title).Count()
-	if err ==nil {
-		if count==0 {
-			o.Insert(t)
-		}
-	}else {
-		beego.Error(err)
+	if err ==nil && count==0 {
+		o.Insert(t)
 	}
+	beego.Debug(count, err)
 
 	return 0
 }

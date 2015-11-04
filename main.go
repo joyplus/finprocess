@@ -2,14 +2,19 @@ package main
 
 import (
 	_ "finprocess/docs"
-	m "finprocess/models"
+	m "adexchange/models"
 	_ "finprocess/routers"
 
 	"github.com/astaxie/beego"
+	"finprocess/tasks"
 )
 
 func main() {
+
 	m.Connect()
+
+	tasks.DailyTask() //启动task
+
 	beego.ViewsPath = "views"
 	beego.TemplateLeft = "<<<"
 	beego.TemplateRight = ">>>"
