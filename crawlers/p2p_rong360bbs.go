@@ -1,4 +1,4 @@
-package main
+package crawlers
 import (
 	"github.com/PuerkitoBio/goquery"
 	"strconv"
@@ -7,42 +7,49 @@ import (
 )
 
 
-func main() {
+func Rong360bbsCrawler() {
 
 	for i := 1; i<6; i++ {
 		u := "http://bbs.rong360.com/forum-76-"+strconv.Itoa(i)+".html"
 		document, _ := goquery.NewDocument(u)
 
-		nodes := document.Find("table#threadlisttableid").Find("tbody").Nodes
-
 		//所有帖子
-		for _, n := range nodes {
+		document.Find("table#threadlisttableid").Find("tbody").Each(func(i int, selection *goquery.Selection) {
 			topic := &models.Topic{}
 
-			doc := goquery.NewDocumentFromNode(n)
-			t := doc.Find("th").First().Find("a.s.xst")
+			topic.Node_id=4
+			topic.Uid=1
+
+			t := selection.Find("th").First().Find("a.s.xst")
 
 			title := t.Text()
-			if title==nil || len(title)==0 {
-				continue
+			if len(title)>0 {
+				topic.Title=title
+
+
+				if titleUrl, f := t.Attr("href"); f {
+					//获取帖子正文
+					c, _ := goquery.NewDocument(titleUrl)
+
+					content := c.Find("div#postlist").First().Find("td.t_f").First()
+
+					content.Find("img").Each(func(i int, se *goquery.Selection) { // 替换图片的src地址
+						if src, exists := se.Attr("file"); exists {
+							se.SetAttr("src", "http://bbs.rong360.com/"+src)
+						}
+					});
+
+					html, _ := content.Html()
+					topic.Content=html
+					topic.Addtime=time.Now().Unix()
+					topic.Updatetime=time.Now().Unix()
+
+					(&models.TopicDao{}).InsertOrUpdate(topic)
+				}
+
 			}
-			topic.Title=title
+		})
 
-			titleUrl, flag := t.Attr("href")
-			if flag {
-				//获取帖子正文
-				c, _ := goquery.NewDocument(titleUrl)
-				content, _ := c.Find("div#postlist").First().Find("td.t_f").First().Html()
-				topic.Content=content
-
-			}
-			topic.Addtime=time.Now().Unix()
-			topic.Updatetime=time.Now().Unix()
-
-			(&models.TopicDao{}).InsertOrUpdate(topic)
-		}
 	}
 
-
-	//title keywords contents
 }

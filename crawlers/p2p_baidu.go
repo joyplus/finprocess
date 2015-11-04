@@ -1,13 +1,13 @@
 package crawlers
 
 import (
-	"fmt"
 	"finprocess/models"
 	"net/http"
 	"io/ioutil"
 	"strings"
 	"strconv"
 	"encoding/json"
+	"github.com/astaxie/beego"
 )
 
 
@@ -17,11 +17,10 @@ func BaiduCrawler() {
 	for i := 1; i<30; i++ {
 
 		newUrl := strings.Replace(url, "{pageNum}", strconv.Itoa(i), -1)
-		fmt.Println(newUrl)
 
 		resp, err := http.Get(newUrl)
 		if err!=nil {
-			fmt.Println(err)
+			beego.Error(err)
 			continue
 		}
 
@@ -29,12 +28,9 @@ func BaiduCrawler() {
 
 		body, err := ioutil.ReadAll(resp.Body)
 		if err!=nil {
-			fmt.Println(err)
+			beego.Error(err)
 			continue
 		}
-
-		//		fmt.Println(string(body))
-
 
 		var dat map[string]interface{}
 		if err := json.Unmarshal(body, &dat); err==nil {
@@ -49,8 +45,6 @@ func BaiduCrawler() {
 
 					for _, v := range li {
 						if product, ok := v.(map[string]interface{}); ok {
-
-							//							fmt.Println(product)
 
 							//赋值
 							master := &models.Master{}
@@ -70,58 +64,54 @@ func BaiduCrawler() {
 							//save master
 							(&models.MasterDao{}).SaveOrUpdate(master)
 
-							invest_contract := &models.Invest_Contract{}
-							invest_contract.For_register = models.For_Register_New
+							invest := &models.Invest_Contract{}
+							invest.For_register = models.For_Register
+
+							invest.Amount_max=999999999
 							if title, ok := product["title"].(string); ok {
-								invest_contract.Name = title
+								invest.Name = title
 							}
 							if idea, ok := product["idea"].(string); ok {
-								invest_contract.Description = idea
+								invest.Description = idea
 							}
 							if lowestAmount, ok := product["lowestAmount"].(string); ok {
 								if strings.Contains(lowestAmount, "元") {
 									amount_min, err := strconv.Atoi(strings.Split(lowestAmount, "元")[0])
 									if err ==nil {
-										invest_contract.Amount_min = amount_min
+										invest.Amount_min = amount_min
 									}
 								}else if strings.Contains(lowestAmount, "万") {
 									amount_min, err := strconv.Atoi(strings.Split(lowestAmount, "万")[0])
 									if err ==nil {
-										invest_contract.Amount_min = amount_min*10000
+										invest.Amount_min = amount_min*10000
 									}
 								}
 							}
-							invest_contract.Duration_type = models.Duration_Type_Month
+							invest.Duration_type = 2
 							if investCycle, ok := product["investCycle"].(string); ok {
 								if strings.Contains(investCycle, "个") {
 									duration_min, err := strconv.Atoi(strings.Split(investCycle, "个")[0])
 									if err ==nil {
-										invest_contract.Duration_min = duration_min
+										invest.Duration_min = duration_min
 									}
 								}
 							}
 							if expectedProfitRate, ok := product["expectedProfitRate"].(string); ok {
 								if rate, err := strconv.ParseFloat(expectedProfitRate, 32); err==nil {
-									invest_contract.Rate = float32(rate)
+									invest.Rate = rate
 								}
 							}
 
 
-							if extraFields, ok := product["extraFields"].([]interface{}); ok {
-								extraField := extraFields[0]
-								if extraField!=nil {
-									if ex, ok1 := extraField.([]interface{}); ok1 {
-										e := ex[0]
-										if e!=nil {
-											if m, ok2 := e.(map[string]interface{}); ok2 {
-												if tips, ok3 := m["tips"]; ok3 {
-													switch tips {
-													case "可提前赎回，可提前转让": invest_contract.Early_terminate = models.Early_Terminate_0
-													case "可提前赎回，不可提前转让":invest_contract.Early_terminate = models.Early_Terminate_1
-													case "不可提前赎回，可提前转让":invest_contract.Early_terminate = models.Early_Terminate_2
-													case "不可提前赎回，不可提前转让":invest_contract.Early_terminate =models.Early_Terminate_3
-													}
-												}
+							if extraFields, ok := product["extraFields"].([]interface{}); ok  && extraFields[0]!=nil {
+								if ex, ok1 := extraFields[0].([]interface{}); ok1 && ex[0]!=nil {
+									if m, ok2 := ex[0].(map[string]interface{}); ok2 {
+										if tips, ok3 := m["tips"]; ok3 {
+											switch tips {
+											case "可提前赎回，可提前转让": invest.Early_terminate = 0
+											case "可提前赎回，不可提前转让":invest.Early_terminate = 1
+											case "不可提前赎回，可提前转让":invest.Early_terminate = 2
+											case "不可提前赎回，不可提前转让":invest.Early_terminate =3
 											}
 										}
 									}
@@ -129,15 +119,11 @@ func BaiduCrawler() {
 
 							}
 
-
-							//fmt.Println(invest_contract)
-							//fmt.Println(master)
-
 							//save invest_contract
-							masterName := strings.Split(invest_contract.Name, " - ")[0]
+							masterName := strings.Split(invest.Name, " - ")[0]
 							masterId := (&models.MasterDao{}).Query(masterName)
-							invest_contract.Master_id= masterId
-							(&models.Invest_ContractDao{}).SaveOrUpdate(invest_contract)
+							invest.Master_id= masterId
+							(&models.Invest_ContractDao{}).SaveOrUpdate(invest)
 
 						}
 					}
@@ -145,8 +131,6 @@ func BaiduCrawler() {
 
 			}
 
-		}else {
-			fmt.Println(err)
 		}
 
 	}

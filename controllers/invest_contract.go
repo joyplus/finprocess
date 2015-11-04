@@ -27,5 +27,4 @@ func (this *InvestContractController) ViewList() {
 
 	this.TplNames = "p2p/p2p.html"
 	this.Render()
-
 }

@@ -1,7 +1,7 @@
 package models
 import (
 	"github.com/astaxie/beego/orm"
-	"fmt"
+	"github.com/astaxie/beego"
 )
 
 
@@ -36,7 +36,7 @@ func (this *MasterDao) QueryByName(name string) (int64) {
 	if err == nil {
 		return count
 	}else {
-		fmt.Println(err)
+		beego.Error(err)
 		return -1
 	}
 }
@@ -47,12 +47,8 @@ func (this *MasterDao) Query(name string) int64 {
 	m := new(Master)
 	qs := o.QueryTable("fin_p2p_master")
 	err := qs.Filter("name", name).One(m)
-	if err==nil {
-		if m!=nil {
-			return m.Id
-		}else {
-			return -1
-		}
+	if err==nil && m!=nil {
+		return m.Id
 	}else {
 		return -1
 	}
@@ -69,12 +65,8 @@ func (this *MasterDao) SaveOrUpdate(m *Master) {
 	o := orm.NewOrm()
 	qs := o.QueryTable("fin_p2p_master")
 	count, err := qs.Filter("name", m.Name).Count()
-	if err ==nil {
-		if count==0 {
-			id, err := o.Insert(m)
-			fmt.Println(id, err)
-		}
-	}else {
-		fmt.Println(err)
+	if err ==nil && count==0 {
+		o.Insert(m)
 	}
+	beego.Debug(count, err)
 }
