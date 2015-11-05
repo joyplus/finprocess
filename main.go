@@ -2,9 +2,9 @@ package main
 
 import (
 	m "adexchange/models"
-	"finprocess/crawlers"
 	_ "finprocess/routers"
-	//"finprocess/tasks"
+
+	"finprocess/tasks"
 	"github.com/astaxie/beego"
 )
 
@@ -24,10 +24,10 @@ func main() {
 	logLevel, _ := beego.AppConfig.Int("log_level")
 	beego.SetLevel(logLevel)
 
-	//go tasks.DailyTaskInit(1) //启动task
+	//minutes for duration
+	duration, _ := beego.AppConfig.Int("task_duration")
 
-	crawlers.Rong360Crawler()
-	crawlers.Rong360bbsCrawler()
+	go tasks.DailyTaskInit(duration) //启动task
 
 	beego.Run()
 
