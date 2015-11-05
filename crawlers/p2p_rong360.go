@@ -3,6 +3,7 @@ package crawlers
 import (
 	"finprocess/models"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/astaxie/beego"
 	"github.com/henrylee2cn/mahonia"
 	"net/http"
 	"strconv"
@@ -17,7 +18,11 @@ func Rong360Crawler() {
 	for i := 1; i < 30; i++ {
 
 		u := "http://www.rong360.com/licai-p2p/list/p" + strconv.Itoa(i)
-		document, _ := getDocument(u)
+		document := getDocument(u)
+
+		if document == nil {
+			continue
+		}
 
 		document.Find("div.floor.clearfix").Find("table.wd-pro-list").Find("tbody").Find("tr").Each(func(i int, selection *goquery.Selection) {
 
@@ -38,8 +43,8 @@ func Rong360Crawler() {
 						description = strings.TrimSpace(s.Text())
 					}
 
-					if product, err := getDocument(clickurl); err == nil {
-
+					product := getDocument(clickurl)
+					if product != nil {
 						master := &models.Master{}
 
 						masterName := product.Find("div.t.clearfix").Find("div.r").Find("p").First().Text()
@@ -50,7 +55,7 @@ func Rong360Crawler() {
 						}
 
 						if u, exists := product.Find("div.view-r-des").Find("a.btn").Attr("href"); exists {
-							if website, err := getDocument(u); err == nil {
+							if website := getDocument(u); website != nil {
 								if u, f := website.Find("div.m.wrap-left").Find("div.p1").Find("a").Attr("href"); f {
 									master.Official_url = u
 								}
@@ -104,6 +109,7 @@ func Rong360Crawler() {
 						(&models.Invest_ContractDao{}).SaveOrUpdate(invest)
 
 					}
+
 				}
 			}
 
@@ -112,23 +118,37 @@ func Rong360Crawler() {
 
 }
 
-func getDocument(url string) (*goquery.Document, error) {
-	req, _ := http.NewRequest("GET", url, nil)
+func getDocument(url string) *goquery.Document {
 
-	req.Header.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
-	//	req.Header.Add("Accept-Encoding", "gzip, deflate, sdch")  //有这个会乱码
-	req.Header.Add("Accept-Language", "zh-CN,zh;q=0.8,en;q=0.6")
-	req.Header.Add("Cache-Control", "max-age=0")
-	req.Header.Add("Connection", "keep-alive")
-	req.Header.Add("Host", "www.rong360.com")
-	req.Header.Add("Upgrade-Insecure-Requests", "1")
-	req.Header.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2490.71 Safari/537.36")
+	req, err := http.NewRequest("GET", url, nil)
 
-	resp, _ := client.Do(req)
+	if err == nil {
 
-	decoder := mahonia.NewDecoder("UTF-8")
+		req.Header.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+		//	req.Header.Add("Accept-Encoding", "gzip, deflate, sdch")  //有这个会乱码
+		req.Header.Add("Accept-Language", "zh-CN,zh;q=0.8,en;q=0.6")
+		req.Header.Add("Cache-Control", "max-age=0")
+		req.Header.Add("Connection", "keep-alive")
+		req.Header.Add("Host", "www.rong360.com")
+		req.Header.Add("Upgrade-Insecure-Requests", "1")
+		req.Header.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2490.71 Safari/537.36")
 
-	document, err := goquery.NewDocumentFromReader(decoder.NewReader(resp.Body))
+		resp, err := client.Do(req)
 
-	return document, err
+		if err == nil && resp.Body != nil {
+			decoder := mahonia.NewDecoder("UTF-8")
+			defer resp.Body.Close()
+			document, err := goquery.NewDocumentFromReader(decoder.NewReader(resp.Body))
+			if err == nil {
+				return document
+			}
+		}
+	}
+
+	if err != nil {
+		beego.Error(err)
+	}
+
+	return nil
+
 }

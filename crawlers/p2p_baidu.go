@@ -32,102 +32,106 @@ func BaiduCrawler() {
 		}
 
 		var dat map[string]interface{}
-		if err := json.Unmarshal(body, &dat); err == nil {
 
-			if data, ok := dat["data"].(map[string]interface{}); ok {
+		e := json.Unmarshal(body, &dat)
+		if e != nil {
+			beego.Error(e)
+			continue
+		}
 
-				if li, ok := data["list"].([]interface{}); ok {
+		if data, ok := dat["data"].(map[string]interface{}); ok {
 
-					if len(li) == 0 {
-						continue
-					}
+			if li, ok := data["list"].([]interface{}); ok {
 
-					for _, v := range li {
-						if product, ok := v.(map[string]interface{}); ok {
+				if len(li) == 0 {
+					continue
+				}
 
-							//赋值
-							master := &models.Master{}
-							if supplierNameShort, ok := product["supplierNameShort"].(string); ok {
-								master.Name = supplierNameShort
-							}
-							if supplierLogoUrl, ok := product["supplierLogoUrl"].(string); ok {
-								master.Platform_icon_url = supplierLogoUrl
-							}
-							if rawUrl, ok := product["rawUrl"].(string); ok {
-								master.Official_url = rawUrl
-							}
-							if idea, ok := product["idea"].(string); ok {
-								master.Product_description = idea
-							}
+				for _, v := range li {
+					if product, ok := v.(map[string]interface{}); ok {
 
-							//save master
-							(&models.MasterDao{}).SaveOrUpdate(master)
+						//赋值
+						master := &models.Master{}
+						if supplierNameShort, ok := product["supplierNameShort"].(string); ok {
+							master.Name = supplierNameShort
+						}
+						if supplierLogoUrl, ok := product["supplierLogoUrl"].(string); ok {
+							master.Platform_icon_url = supplierLogoUrl
+						}
+						if rawUrl, ok := product["rawUrl"].(string); ok {
+							master.Official_url = rawUrl
+						}
+						if idea, ok := product["idea"].(string); ok {
+							master.Product_description = idea
+						}
 
-							invest := &models.Invest_Contract{}
-							invest.For_register = models.For_Register
+						//save master
+						(&models.MasterDao{}).SaveOrUpdate(master)
 
-							invest.Amount_max = 999999999
-							if title, ok := product["title"].(string); ok {
-								invest.Name = title
-							}
-							if idea, ok := product["idea"].(string); ok {
-								invest.Description = idea
-							}
-							if lowestAmount, ok := product["lowestAmount"].(string); ok {
-								if strings.Contains(lowestAmount, "元") {
-									amount_min, err := strconv.Atoi(strings.Split(lowestAmount, "元")[0])
-									if err == nil {
-										invest.Amount_min = amount_min
-									}
-								} else if strings.Contains(lowestAmount, "万") {
-									amount_min, err := strconv.Atoi(strings.Split(lowestAmount, "万")[0])
-									if err == nil {
-										invest.Amount_min = amount_min * 10000
-									}
+						invest := &models.Invest_Contract{}
+						invest.For_register = models.For_Register
+
+						invest.Amount_max = 999999999
+						if title, ok := product["title"].(string); ok {
+							invest.Name = title
+						}
+						if idea, ok := product["idea"].(string); ok {
+							invest.Description = idea
+						}
+						if lowestAmount, ok := product["lowestAmount"].(string); ok {
+							if strings.Contains(lowestAmount, "元") {
+								amount_min, err := strconv.Atoi(strings.Split(lowestAmount, "元")[0])
+								if err == nil {
+									invest.Amount_min = amount_min
+								}
+							} else if strings.Contains(lowestAmount, "万") {
+								amount_min, err := strconv.Atoi(strings.Split(lowestAmount, "万")[0])
+								if err == nil {
+									invest.Amount_min = amount_min * 10000
 								}
 							}
-							invest.Duration_type = 2
-							if investCycle, ok := product["investCycle"].(string); ok {
-								if strings.Contains(investCycle, "个") {
-									duration_min, err := strconv.Atoi(strings.Split(investCycle, "个")[0])
-									if err == nil {
-										invest.Duration_min = duration_min
-									}
+						}
+						invest.Duration_type = 2
+						if investCycle, ok := product["investCycle"].(string); ok {
+							if strings.Contains(investCycle, "个") {
+								duration_min, err := strconv.Atoi(strings.Split(investCycle, "个")[0])
+								if err == nil {
+									invest.Duration_min = duration_min
 								}
 							}
-							if expectedProfitRate, ok := product["expectedProfitRate"].(string); ok {
-								if rate, err := strconv.ParseFloat(expectedProfitRate, 32); err == nil {
-									invest.Rate = rate
-								}
+						}
+						if expectedProfitRate, ok := product["expectedProfitRate"].(string); ok {
+							if rate, err := strconv.ParseFloat(expectedProfitRate, 32); err == nil {
+								invest.Rate = rate
 							}
+						}
 
-							if extraFields, ok := product["extraFields"].([]interface{}); ok && extraFields[0] != nil {
-								if ex, ok1 := extraFields[0].([]interface{}); ok1 && ex[0] != nil {
-									if m, ok2 := ex[0].(map[string]interface{}); ok2 {
-										if tips, ok3 := m["tips"]; ok3 {
-											switch tips {
-											case "可提前赎回，可提前转让":
-												invest.Early_terminate = 0
-											case "可提前赎回，不可提前转让":
-												invest.Early_terminate = 1
-											case "不可提前赎回，可提前转让":
-												invest.Early_terminate = 2
-											case "不可提前赎回，不可提前转让":
-												invest.Early_terminate = 3
-											}
+						if extraFields, ok := product["extraFields"].([]interface{}); ok && extraFields[0] != nil {
+							if ex, ok1 := extraFields[0].([]interface{}); ok1 && ex[0] != nil {
+								if m, ok2 := ex[0].(map[string]interface{}); ok2 {
+									if tips, ok3 := m["tips"]; ok3 {
+										switch tips {
+										case "可提前赎回，可提前转让":
+											invest.Early_terminate = 0
+										case "可提前赎回，不可提前转让":
+											invest.Early_terminate = 1
+										case "不可提前赎回，可提前转让":
+											invest.Early_terminate = 2
+										case "不可提前赎回，不可提前转让":
+											invest.Early_terminate = 3
 										}
 									}
 								}
-
 							}
 
-							//save invest_contract
-							masterName := strings.Split(invest.Name, " - ")[0]
-							masterId := (&models.MasterDao{}).Query(masterName)
-							invest.Master_id = masterId
-							(&models.Invest_ContractDao{}).SaveOrUpdate(invest)
-
 						}
+
+						//save invest_contract
+						masterName := strings.Split(invest.Name, " - ")[0]
+						masterId := (&models.MasterDao{}).Query(masterName)
+						invest.Master_id = masterId
+						(&models.Invest_ContractDao{}).SaveOrUpdate(invest)
+
 					}
 				}
 
