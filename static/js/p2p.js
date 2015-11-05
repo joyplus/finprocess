@@ -61,7 +61,29 @@ var $wealth_contents = new Array();
                 }
                 obj.profit = $data[i].Rate;
                 obj.money = $data[i].Amount_min;
-                obj.time = $data[i].Duration_min;
+
+                //用于筛选
+                switch($data[i].Duration_type){
+                    case 0:
+                        obj.time=$data[i].Duration_min/30;
+                        break;
+                    case 1:
+                        obj.time=$data[i].Duration_min/4;
+                        break;
+                    case 2:
+                        obj.time=$data[i].Duration_min;
+                        break;
+                    case 3:
+                        obj.time=$data[i].Duration_min*12;
+                        break;
+                    default:
+                        obj.time=$data[i].Duration_min;
+                        break;
+                }
+
+                obj.duration = $data[i].Duration_min;//实际显示的值和类型
+                obj.duration_type = $data[i].Duration_type;
+
                 obj.ifdisplay = "true"
 
                 $wealth_contents[i] = obj;
