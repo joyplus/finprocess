@@ -15,9 +15,10 @@ var $wealth_contents = new Array();
                 var obj = new Object();
 
                 obj.child_title = $data[i].Name;
+                obj.child_title_bk=$data[i].Name;
 
                 var child_content = new Array();
-                child_content[0]="不限"
+                child_content[0]="不限";
                 $.ajax({
                     type: "GET",
                     url: "/v1/lov/list/" + $data[i].Code,
