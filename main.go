@@ -1,12 +1,12 @@
 package main
 
 import (
-	_ "finprocess/docs"
 	m "adexchange/models"
+	_ "finprocess/docs"
 	_ "finprocess/routers"
 
-	"github.com/astaxie/beego"
 	"finprocess/tasks"
+	"github.com/astaxie/beego"
 )
 
 func main() {

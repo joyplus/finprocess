@@ -1,7 +1,8 @@
 package models
+
 import (
-	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 )
 
 type Topic struct {
@@ -25,21 +26,18 @@ type Topic struct {
 	Ord          int
 }
 
-
-
 func (this *Topic) TableName() string {
 	return "stb_topics"
 }
 
 type TopicDao struct {
-
 }
 
 func (this *TopicDao) InsertOrUpdate(t *Topic) int64 {
 	o := orm.NewOrm()
 	qs := o.QueryTable("stb_topics")
 	count, err := qs.Filter("title", t.Title).Count()
-	if err ==nil && count==0 {
+	if err == nil && count == 0 {
 		o.Insert(t)
 	}
 	beego.Debug(count, err)

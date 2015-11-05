@@ -1,11 +1,12 @@
 package crawlers
+
 import (
+	"finprocess/models"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/henrylee2cn/mahonia"
+	"net/http"
 	"strconv"
 	"strings"
-	"finprocess/models"
-	"net/http"
-	"github.com/henrylee2cn/mahonia"
 )
 
 var client = &http.Client{}
@@ -13,45 +14,45 @@ var client = &http.Client{}
 func Rong360Crawler() {
 
 	//只获取前30页的,防止被屏蔽
-	for i := 1; i<30; i++ {
+	for i := 1; i < 30; i++ {
 
-		u := "http://www.rong360.com/licai-p2p/list/p"+strconv.Itoa(i)
+		u := "http://www.rong360.com/licai-p2p/list/p" + strconv.Itoa(i)
 		document, _ := getDocument(u)
 
 		document.Find("div.floor.clearfix").Find("table.wd-pro-list").Find("tbody").Find("tr").Each(func(i int, selection *goquery.Selection) {
 
-			if i%2==0 {
+			if i%2 == 0 {
 				if clickurl, f := selection.Attr("click-url"); f {
 
 					invest := &models.Invest_Contract{}
 
-					//platform_id
+					//platform_idz
 					us := strings.Split(clickurl, "-")
-					if len(us)>0 {
+					if len(us) > 0 {
 						platform_id := us[len(us)-1]
-						invest.Platform_id=platform_id
+						invest.Platform_id = platform_id
 					}
 
 					var description string
-					if s := selection.Find("td.td7"); s!=nil {
-						description=strings.TrimSpace(s.Text())
+					if s := selection.Find("td.td7"); s != nil {
+						description = strings.TrimSpace(s.Text())
 					}
 
-					if product, err := getDocument(clickurl); err==nil {
+					if product, err := getDocument(clickurl); err == nil {
 
 						master := &models.Master{}
 
 						masterName := product.Find("div.t.clearfix").Find("div.r").Find("p").First().Text()
-						master.Name=masterName
+						master.Name = masterName
 
 						if icon_url, exists := product.Find("div.t.clearfix").Find("div.l").Find("img").Attr("src"); exists {
-							master.Platform_icon_url=icon_url
+							master.Platform_icon_url = icon_url
 						}
 
 						if u, exists := product.Find("div.view-r-des").Find("a.btn").Attr("href"); exists {
-							if website, err := getDocument(u); err==nil {
+							if website, err := getDocument(u); err == nil {
 								if u, f := website.Find("div.m.wrap-left").Find("div.p1").Find("a").Attr("href"); f {
-									master.Official_url=u
+									master.Official_url = u
 								}
 							}
 						}
@@ -59,48 +60,47 @@ func Rong360Crawler() {
 						//save master
 						(&models.MasterDao{}).SaveOrUpdate(master)
 
-
 						//title description
-						invest.Description=description
-						invest.For_register=models.For_Register
-						invest.Amount_max=999999999
+						invest.Description = description
+						invest.For_register = models.For_Register
+						invest.Amount_max = 999999999
 						title := product.Find("div.t").Find("span").Text()
-						invest.Name=title
+						invest.Name = title
 
 						//rate and duration
 						rateAndDuration := product.Find("div.d").Find("p").Nodes
-						if (len(rateAndDuration)==3) {
+						if len(rateAndDuration) == 3 {
 							rate_text := goquery.NewDocumentFromNode(rateAndDuration[0]).Find("span").Text()
-							if rate, err := strconv.ParseFloat(strings.TrimRight(rate_text, "%"), 16); err==nil {
-								invest.Rate=rate
+							if rate, err := strconv.ParseFloat(strings.TrimRight(rate_text, "%"), 16); err == nil {
+								invest.Rate = rate
 							}
 
 							durationNode := goquery.NewDocumentFromNode(rateAndDuration[1])
-							if duration, err := strconv.Atoi(durationNode.Find("span").Text()); err==nil {
-								invest.Duration_min=duration
+							if duration, err := strconv.Atoi(durationNode.Find("span").Text()); err == nil {
+								invest.Duration_min = duration
 							}
 
 							durationTypeText := durationNode.Text()
 							if strings.Contains(durationTypeText, "天") {
-								invest.Duration_type=models.Duration_Type_Day
+								invest.Duration_type = models.Duration_Type_Day
 							} else if strings.Contains(durationTypeText, "月") {
-								invest.Duration_type=models.Duration_Type_Month
-							}else if strings.Contains(durationTypeText, "年") {
-								invest.Duration_type=models.Duration_Type_Year
+								invest.Duration_type = models.Duration_Type_Month
+							} else if strings.Contains(durationTypeText, "年") {
+								invest.Duration_type = models.Duration_Type_Year
 							}
 						}
 
 						clearfix := product.Find("div.c.clearfix").Find("table.tab1").Find("tr").Nodes
-						if len(clearfix)==6 {
+						if len(clearfix) == 6 {
 							amountNode := goquery.NewDocumentFromNode(clearfix[3])
-							if amount, err := strconv.Atoi(strings.TrimLeft(strings.TrimRight(amountNode.Find(".td2").Text(), "万元"), "元")); err==nil {
-								invest.Amount_min=amount
+							if amount, err := strconv.Atoi(strings.TrimLeft(strings.TrimRight(amountNode.Find(".td2").Text(), "万元"), "元")); err == nil {
+								invest.Amount_min = amount
 							}
 						}
 
 						//save invest_contract
 						masterId := (&models.MasterDao{}).Query(masterName)
-						invest.Master_id= masterId
+						invest.Master_id = masterId
 						(&models.Invest_ContractDao{}).SaveOrUpdate(invest)
 
 					}
@@ -111,7 +111,6 @@ func Rong360Crawler() {
 	}
 
 }
-
 
 func getDocument(url string) (*goquery.Document, error) {
 	req, _ := http.NewRequest("GET", url, nil)

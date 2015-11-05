@@ -1,10 +1,9 @@
 package models
+
 import (
-	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 )
-
-
 
 type Master struct {
 	Id                   int64
@@ -19,41 +18,36 @@ type Master struct {
 	Risk_rank            int64
 }
 
-
 func (this *Master) TableName() string {
 	return "fin_p2p_master"
 }
 
-
 type MasterDao struct {
-
 }
 
-func (this *MasterDao) QueryByName(name string) (int64) {
+func (this *MasterDao) QueryByName(name string) int64 {
 	o := orm.NewOrm()
 	qs := o.QueryTable("fin_p2p_master")
 	count, err := qs.Filter("name", name).Count()
 	if err == nil {
 		return count
-	}else {
+	} else {
 		beego.Error(err)
 		return -1
 	}
 }
-
 
 func (this *MasterDao) Query(name string) int64 {
 	o := orm.NewOrm()
 	m := new(Master)
 	qs := o.QueryTable("fin_p2p_master")
 	err := qs.Filter("name", name).One(m)
-	if err==nil && m!=nil {
+	if err == nil && m != nil {
 		return m.Id
-	}else {
+	} else {
 		return -1
 	}
 }
-
 
 func (this *MasterDao) Save(m *Master) (int64, error) {
 	o := orm.NewOrm()
@@ -65,7 +59,7 @@ func (this *MasterDao) SaveOrUpdate(m *Master) {
 	o := orm.NewOrm()
 	qs := o.QueryTable("fin_p2p_master")
 	count, err := qs.Filter("name", m.Name).Count()
-	if err ==nil && count==0 {
+	if err == nil && count == 0 {
 		o.Insert(m)
 	}
 	beego.Debug(count, err)
