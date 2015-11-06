@@ -9,7 +9,6 @@ CREATE TABLE `fin_p2p_invest_contract` (
   `amount_min` int(11) DEFAULT NULL,
   `amount_max` int(11) DEFAULT NULL,
   `duration_min` int(11) DEFAULT NULL,
-  `duration_type` tinyint(4) DEFAULT NULL,
   `duration_max` int(11) DEFAULT NULL,
   `duration_type` int(11) DEFAULT NULL COMMENT '0: 天; 1:周; ２:月; 3:年',
   `for_register` tinyint(4) DEFAULT NULL COMMENT '0: 非新注册用户专享;1:新注册用户专享',
