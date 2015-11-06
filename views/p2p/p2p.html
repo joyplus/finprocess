@@ -9,7 +9,7 @@
     </head>
     <body>
         <div class="main">
-            <table class="ui-filter" id="p2p_filter">
+            <table v-cloak class="ui-filter" id="p2p_filter">
                     <tbody>
                         <tr>
                             <td class="ui-select amount-select" v-repeat="item in select_titles" >
@@ -23,12 +23,12 @@
                             </td>
                         </tr>
                     </tbody>
-            <table>
-            <div class="result wealth-result" id="wealth_result">
-                <a href="{{wealth.url}}" tag="" class="result-item" v-repeat="wealth in wealth_contents" style="display: {{wealth.ifdisplay ? 'block':'none'}};">
+            </table>
+            <div v-cloak class="result wealth-result" id="wealth_result">
+                <a href="{{wealth.url}}" tag="" class="result-item" v-repeat="wealth in wealth_contents"
+                   style="display: {{wealth.ifdisplay ? 'block':'none'}};">
                     <div><span>{{wealth.title}}</span></div>
                     <ul>
-
                         <li class="limit">期限：<b>{{wealth.duration}}</b>
                             <span v-if="wealth.duration_type == 0" >天</span>
                             <span v-if="wealth.duration_type == 1" >周</span>
