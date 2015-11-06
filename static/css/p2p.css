@@ -106,3 +106,7 @@ ol, ul {
     font-family: Arial;
     color: #c40004;
 }
+
+[v-cloak] {
+    display: none;
+}
