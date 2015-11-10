@@ -77,6 +77,11 @@ func Rong360Crawler() {
 						title := product.Find("div.t").Find("span").Text()
 						invest.Name = title
 
+						//product_url
+						if product_url, exists := product.Find("div.c.clearfix").Find("td.td3").Find("a").Attr("href"); exists {
+							invest.Product_url = product_url
+						}
+
 						//rate and duration
 						rateAndDuration := product.Find("div.d").Find("p").Nodes
 						if len(rateAndDuration) == 3 {

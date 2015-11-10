@@ -23,6 +23,7 @@ func Rong360bbsCrawler() {
 
 			topic.Node_id = 4
 			topic.Uid = 1
+			topic.Ord = time.Now().Unix()
 
 			t := selection.Find("th").First().Find("a.s.xst")
 
