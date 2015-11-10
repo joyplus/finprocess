@@ -1,12 +1,12 @@
 package tests
+
 import (
-	"time"
 	"fmt"
 	"testing"
+	"time"
 )
 
-
 //go test -v time_test.go
-func TestTime(t *testing.T){
-	fmt.Println(time.Now().Unix())
+func TestTime(t *testing.T) {
+	fmt.Println(time.Now())
 }

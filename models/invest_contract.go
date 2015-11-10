@@ -126,3 +126,16 @@ func (this *Invest_ContractDao) ListAll() []Invest_Contract {
 	}
 	return nil
 }
+
+//执行rong360task时,删除10分钟前的数据,也就是上次更新的数据,即每次只保留新的30页数据
+func (this *Invest_ContractDao) DeleteAllRong360() {
+	o := orm.NewOrm()
+	before := time.Now().Add(-10 * time.Minute).Format("2006-01-02 15:04:05")
+
+	sql := "delete from `fin_p2p_invest_contract` where platform_id !=0 and update_time <= '" + before + "'"
+	_, err := o.Raw(sql).Exec()
+
+	if err != nil {
+		beego.Error(err)
+	}
+}
