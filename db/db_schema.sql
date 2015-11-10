@@ -61,3 +61,9 @@ CREATE TABLE `fin_p2p_master` (
   `risk_rank` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+/* update prodct contract */
+ALTER TABLE `fin_p2p_invest_contract` ADD `product_url` VARCHAR(500) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `description`, ADD `update_time` TIMESTAMP NOT NULL AFTER `product_url`, ADD `disp_order` INT NOT NULL AFTER `update_time`;
+ALTER TABLE `fin_p2p_invest_contract` ADD `create_time` TIMESTAMP NULL DEFAULT NULL AFTER `product_url`;
