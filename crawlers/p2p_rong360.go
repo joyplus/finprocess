@@ -124,7 +124,9 @@ func Rong360Crawler() {
 
 		})
 	}
-
+	//删除之前的数据
+	investDao := &models.Invest_ContractDao{}
+	investDao.DeleteAllRong360()
 }
 
 func getDocument(url string) *goquery.Document {
