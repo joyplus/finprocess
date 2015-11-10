@@ -77,7 +77,7 @@ func (this *Invest_ContractDao) SaveOrUpdate(i *Invest_Contract) {
 	}
 
 	now, err := time.Parse("2006-01-02 15:04:05", time.Now().Format("2006-01-02 15:04:05"))
-	if err != nil {
+	if err == nil {
 		now = time.Now().Local()
 	} else {
 		beego.Error(err)
@@ -86,7 +86,7 @@ func (this *Invest_ContractDao) SaveOrUpdate(i *Invest_Contract) {
 	if exist {
 		o.Delete(dao)
 		create, e := time.Parse("2006-01-02 15:04:05", dao.Create_time.Format("2006-01-02 15:04:05"))
-		if e != nil {
+		if e == nil {
 			create = time.Now().Local()
 		} else {
 			beego.Error(e)
