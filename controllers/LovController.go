@@ -1,7 +1,8 @@
 package controllers
+
 import (
-	"github.com/astaxie/beego"
 	"finprocess/models"
+	"github.com/astaxie/beego"
 )
 
 type LovController struct {
@@ -14,7 +15,7 @@ type LovController struct {
 func (this *LovController) Types() {
 	lovDao := &models.LovDao{}
 	lovs := lovDao.Types()
-	this.Data["json"]=lovs
+	this.Data["json"] = lovs
 	this.ServeJson()
 }
 
@@ -24,10 +25,10 @@ func (this *LovController) Types() {
 // @router /list/:t [get]
 func (this *LovController) List() {
 	t, err := this.GetInt(":t")
-	if err==nil {
+	if err == nil {
 		lovDao := &models.LovDao{}
 		lovs := lovDao.List(t)
-		this.Data["json"]=lovs
+		this.Data["json"] = lovs
 	}
 	this.ServeJson()
 }
