@@ -8,5 +8,7 @@ import (
 
 //go test -v time_test.go
 func TestTime(t *testing.T) {
+
 	fmt.Println(time.Now())
+
 }
