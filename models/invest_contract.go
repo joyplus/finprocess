@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"strconv"
@@ -50,10 +51,23 @@ func (this *Invest_ContractDao) QueryByName(name string) int64 {
 	}
 }
 
-func (this *Invest_ContractDao) Save(i *Invest_Contract) (int64, error) {
+//时间类型的值,如果使用o.Insert o.Update方法,go会自动转成UTC时间保存到数据库
+func (this *Invest_ContractDao) Save(i *Invest_Contract) {
 	o := orm.NewOrm()
-	id, err := o.Insert(i)
-	return id, err
+	sql := "INSERT INTO fin_p2p_invest_contract (platform_id, name, master_id, description, amount_min, amount_max, duration_min, duration_max, duration_type, for_register, rate, early_terminate, risk_rank, product_url, disp_order, create_time, update_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	_, err := o.Raw(sql, i.Platform_id, i.Name, i.Master_id, i.Description, i.Amount_min, i.Amount_max, i.Duration_min, i.Duration_max, i.Duration_type, i.For_register, i.Rate, i.Early_terminate, i.Risk_rank, i.Product_url, i.Disp_order, i.Create_time, i.Update_time).Exec()
+	if err != nil {
+		beego.Error(err)
+	}
+}
+
+func (this *Invest_ContractDao) Update(i *Invest_Contract) {
+	o := orm.NewOrm()
+	sql := "UPDATE fin_p2p_invest_contract SET platform_id = ?, name = ?, master_id = ?, description = ?, amount_min = ?, amount_max = ?, duration_min = ?, duration_max = ?, duration_type = ?, for_register = ?, rate = ?, early_terminate = ?, risk_rank = ?, product_url = ?, disp_order = ?, create_time = ?, update_time = ? WHERE id = ?"
+	_, err := o.Raw(sql, i.Platform_id, i.Name, i.Master_id, i.Description, i.Amount_min, i.Amount_max, i.Duration_min, i.Duration_max, i.Duration_type, i.For_register, i.Rate, i.Early_terminate, i.Risk_rank, i.Product_url, i.Disp_order, i.Create_time, i.Update_time, i.Id).Exec()
+	if err != nil {
+		beego.Error(err)
+	}
 }
 
 func (this *Invest_ContractDao) SaveOrUpdate(i *Invest_Contract) {
@@ -76,28 +90,18 @@ func (this *Invest_ContractDao) SaveOrUpdate(i *Invest_Contract) {
 		}
 	}
 
-	now, err := time.Parse("2006-01-02 15:04:05", time.Now().Format("2006-01-02 15:04:05"))
-	if err == nil {
-		now = time.Now().Local()
-	} else {
+	now, err := time.ParseInLocation("2006-01-02 15:04:05", time.Now().Format("2006-01-02 15:04:05"), time.Local)
+	if err != nil {
 		beego.Error(err)
 	}
 
 	if exist {
-		o.Delete(dao)
-		create, e := time.Parse("2006-01-02 15:04:05", dao.Create_time.Format("2006-01-02 15:04:05"))
-		if e == nil {
-			create = time.Now().Local()
-		} else {
-			beego.Error(e)
-		}
-		i.Create_time = create
 		i.Update_time = now
-		o.Insert(i)
+		this.Update(dao)
 	} else {
 		i.Create_time = now
 		i.Update_time = now
-		o.Insert(i)
+		this.Save(i)
 	}
 
 }
@@ -127,14 +131,13 @@ func (this *Invest_ContractDao) ListAll() []Invest_Contract {
 	return nil
 }
 
-//执行rong360task时,删除10分钟前的数据,也就是上次更新的数据,即每次只保留新的30页数据
-func (this *Invest_ContractDao) DeleteAllRong360() {
+//执行rong360task时,删除任务执行前的数据
+func (this *Invest_ContractDao) DeleteAllRong360(startTime time.Time) {
 	o := orm.NewOrm()
-	before := time.Now().Add(-10 * time.Minute).Format("2006-01-02 15:04:05")
-
-	sql := "delete from `fin_p2p_invest_contract` where platform_id !=0 and update_time <= '" + before + "'"
+	t := startTime.Format("2006-01-02 15:04:05")
+	fmt.Println(t)
+	sql := "delete from `fin_p2p_invest_contract` where LENGTH(platform_id)>0 and update_time < '" + t + "'"
 	_, err := o.Raw(sql).Exec()
-
 	if err != nil {
 		beego.Error(err)
 	}

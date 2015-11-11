@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var client = &http.Client{}
@@ -15,6 +16,9 @@ var client = &http.Client{}
 func Rong360Crawler() {
 
 	beego.Info("Process rong360 product")
+
+	//记录任务执行时的时间
+	startTime := time.Now()
 
 	//只获取前30页的,防止被屏蔽
 	for i := 1; i < 30; i++ {
@@ -126,7 +130,7 @@ func Rong360Crawler() {
 	}
 	//删除之前的数据
 	investDao := &models.Invest_ContractDao{}
-	investDao.DeleteAllRong360()
+	investDao.DeleteAllRong360(startTime)
 }
 
 func getDocument(url string) *goquery.Document {

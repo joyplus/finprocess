@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"finprocess/models"
+	"finprocess/crawlers"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 	"testing"
@@ -15,15 +15,15 @@ func init() {
 
 func TestP2p(t *testing.T) {
 
-	//	crawlers.BaiduCrawler()
+	crawlers.BaiduCrawler()
 
-	//	crawlers.Rong360Crawler()
+	crawlers.Rong360Crawler()
 
-	//	crawlers.Rong360bbsCrawler()
+	//		crawlers.Rong360bbsCrawler()
 
 }
 
-func TestDelete(t *testing.T) {
-	investDao := &models.Invest_ContractDao{}
-	investDao.DeleteAllRong360()
-}
+//func TestDelete(t *testing.T) {
+//	investDao := &models.Invest_ContractDao{}
+//	investDao.DeleteAllRong360()
+//}
